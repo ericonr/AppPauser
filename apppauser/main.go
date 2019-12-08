@@ -14,6 +14,10 @@ func CreateSocket() net.Listener {
 	path := "/tmp/app-pauser.socket"
 	conn, err := net.Listen("unix", path)
 	if err != nil {
+		// If it can't listen at the socket, it's probably due to it
+		// not having been closed by the previous instance.
+		// Therefore, try to remove it! */
+
 		log.Println("Removed: ", path)
 		os.Remove(path)
 		conn = CreateSocket()
