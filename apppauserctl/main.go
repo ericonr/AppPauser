@@ -12,6 +12,7 @@ func main() {
 		fmt.Println("Requires argument:")
 		fmt.Println("  pause")
 		fmt.Println("  resume")
+		fmt.Println("  toggle")
 		fmt.Println("  kill")
 		os.Exit(1)
 	}

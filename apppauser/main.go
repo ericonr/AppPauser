@@ -30,10 +30,35 @@ func CloseSocket(conn net.Listener) {
 	log.Println("Closed socket: ", conn.Addr())
 }
 
+type ProcessStatus int
+
+// Enums for the status of the running process
 const (
-	Paused  = iota
-	Running = iota
+	Paused  ProcessStatus = iota
+	Running ProcessStatus = iota
 )
+
+func Pause(process *os.Process) ProcessStatus {
+	log.Println("Pausing: ", process.Pid)
+	err := process.Signal(syscall.SIGSTOP)
+	if err != nil {
+		log.Println("Unable to pause application.")
+		return Running
+	} else {
+		return Paused
+	}
+}
+
+func Resume(process *os.Process) ProcessStatus {
+	log.Println("Resuming: ", process.Pid)
+	err := process.Signal(syscall.SIGCONT)
+	if err != nil {
+		log.Println("Unable to resume application.")
+		return Paused
+	} else {
+		return Running
+	}
+}
 
 func SocketMonitor(listen net.Listener, process *os.Process) {
 	status := Running
@@ -52,9 +77,7 @@ func SocketMonitor(listen net.Listener, process *os.Process) {
 		clean_read := strings.TrimRight(string(read), string(0))
 		if clean_read == "pause" {
 			if status == Running {
-				log.Println("Pausing: ", process.Pid)
-				process.Signal(syscall.SIGSTOP)
-				status = Paused
+				status = Pause(process)
 			} else {
 				log.Println("Application is already paused.")
 			}
@@ -62,16 +85,21 @@ func SocketMonitor(listen net.Listener, process *os.Process) {
 			if status == Running {
 				log.Println("Application is already running.")
 			} else {
-				log.Println("Resuming: ", process.Pid)
-				process.Signal(syscall.SIGCONT)
-				status = Running
+				status = Resume(process)
+			}
+		} else if clean_read == "toggle" {
+			if status == Running {
+				status = Pause(process)
+			} else if status == Paused {
+				status = Resume(process)
 			}
 		} else if clean_read == "kill" {
 			log.Println("Killing: ", process.Pid)
 			if status == Paused {
-				process.Signal(syscall.SIGCONT)
+				status = Resume(process)
 			}
 			process.Signal(syscall.SIGTERM)
+			break
 		}
 	}
 }

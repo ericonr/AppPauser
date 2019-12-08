@@ -26,6 +26,7 @@ where `command` can be:
 
 * `pause`: sends the SIGSTOP signal to an application
 * `resume`: sends the SIGCONT signal to an application
+* `toggle`: sends either SIGSTOP or SIGCONT signal to an application, depending on its current status
 * `kill`: sends the SIGTERM signal to an application
 
 ## How to install
