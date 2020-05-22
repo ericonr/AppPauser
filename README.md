@@ -31,7 +31,7 @@ where `command` can be:
 
 ## How to install
 
-Install the Go compiler, and then run `go install ./...` to compile both binaries and store them in `$GOBIN`. 
+Install the Go compiler, and then run `go get github.com/ericonr/AppPauser` to compile both binaries and store them in `$GOBIN`. 
 You then only need to add `$GOBIN` to your `$PATH` and you are ready to use this!
 
 ## Future steps
